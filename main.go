@@ -10,9 +10,6 @@ import (
 	"sync"
 	"time"
 
-	ds "github.com/ipfs/go-datastore"
-	dssync "github.com/ipfs/go-datastore/sync"
-
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p-core/crypto"
@@ -172,13 +169,12 @@ func crypto_key() crypto.PrivKey {
 }
 
 func client_node(ctx context.Context, id peer.ID) (host.Host, error) {
-	ds := dssync.MutexWrap(ds.NewMapDatastore())
 
 	h, err := libp2p.New(
 		libp2p.Identity(crypto_key()),
 		libp2p.ListenAddrStrings(listen_addrs()...),
 		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
-			return dht.NewDHTClient(ctx, h, ds), nil
+			return dht.New(ctx, h, dht.Mode(dht.ModeClient))
 		}),
 
 		libp2p.EnableHolePunching(),
@@ -197,13 +193,11 @@ func client_node(ctx context.Context, id peer.ID) (host.Host, error) {
 
 func server_node(ctx context.Context) (host.Host, error) {
 
-	ds := dssync.MutexWrap(ds.NewMapDatastore())
-
 	h, err := libp2p.New(
 		libp2p.ListenAddrStrings(listen_addrs()...),
 		libp2p.Identity(crypto_key()),
 		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
-			return dht.NewDHTClient(ctx, h, ds), nil
+			return dht.New(ctx, h, dht.Mode(dht.ModeClient))
 		}),
 		libp2p.EnableHolePunching(),
 		libp2p.EnableAutoRelay(),
