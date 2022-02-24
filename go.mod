@@ -11,7 +11,7 @@ require (
 	github.com/multiformats/go-multiaddr v0.4.0
 )
 
-replace github.com/libp2p/go-libp2p v0.17.0 => github.com/optman/go-libp2p v0.17.1-0.20220218023642-8d43bee34192
+replace github.com/libp2p/go-libp2p v0.17.0 => github.com/optman/go-libp2p v0.17.1-0.20220224074507-81998574ff83
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
