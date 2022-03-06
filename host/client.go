@@ -2,6 +2,7 @@ package host
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"p2p-tun/host/p2p"
 	"time"
@@ -31,7 +32,7 @@ func NewClient(ctx context.Context, port int, seed int64) (*Client, error) {
 	}, nil
 }
 
-func (self *Client) Connect(id peer.ID) {
+func (self *Client) Connect(id peer.ID) error {
 	self.target_id = id
 
 	ctx := self.ctx
@@ -48,7 +49,7 @@ func (self *Client) Connect(id peer.ID) {
 		select {
 		case <-time.After(retry_wait):
 		case <-ctx.Done():
-			return
+			return nil
 		}
 
 		if retry_wait < 5*time.Minute {
@@ -62,9 +63,10 @@ func (self *Client) Connect(id peer.ID) {
 	buf := make([]byte, 5)
 	s.Read(buf)
 	if string(buf) != "world" {
-		panic("invalid peer")
+		return fmt.Errorf("invalid peer")
 	}
 
+	return nil
 }
 
 func (self *Client) CreateStream(proto protocol.ID) func(context.Context) (io.ReadWriteCloser, error) {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 	"net"
-	"sync"
+	"p2p-tun/util"
 
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p-core/protocol"
@@ -16,31 +16,10 @@ var (
 
 const ProtocolID = protocol.ID("/pfw")
 
-func concat_conn(src, dst io.ReadWriteCloser) {
-	defer src.Close()
-	defer dst.Close()
-
-	var wg sync.WaitGroup
-
-	cp := func(dst, src io.ReadWriteCloser) {
-		defer wg.Done()
-
-		io.Copy(dst, src)
-		dst.Close()
-	}
-
-	wg.Add(2)
-
-	go cp(dst, src)
-	go cp(src, dst)
-
-	wg.Wait()
-}
-
 func handle_stream(src io.ReadWriteCloser, forward_addr string) {
 
 	if dst, err := net.Dial("tcp", forward_addr); err == nil {
-		concat_conn(src, dst)
+		util.ConcatStream(src, dst)
 
 	} else {
 		src.Close()
@@ -81,7 +60,7 @@ func RunClient(ctx context.Context, local_addr string, newStream NewStream) erro
 				return
 			}
 
-			concat_conn(src, dst)
+			util.ConcatStream(src, dst)
 
 		}()
 	}

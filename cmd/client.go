@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"p2p-tun/cmd/port"
+	"p2p-tun/cmd/tun"
 	"p2p-tun/host"
 
 	"github.com/libp2p/go-libp2p-core/peer"
@@ -23,6 +24,7 @@ func ClientCmd() *cli.Command {
 		},
 		Subcommands: []*cli.Command{
 			port.ClientCmd(),
+			tun.TunCmd(),
 		},
 		Before: connect,
 	}
@@ -39,11 +41,19 @@ func connect(c *cli.Context) error {
 	if err != nil {
 		panic(err)
 	}
-	client.Connect(server_id)
 
-	log.Info("connected")
+	readyChan := make(chan struct{})
+
+	go func() {
+		if err := client.Connect(server_id); err != nil {
+			log.Fatal(err)
+		}
+		log.Info("connected")
+		close(readyChan)
+	}()
 
 	c.Context = context.WithValue(c.Context, "client", client)
+	c.Context = context.WithValue(c.Context, "ready", readyChan)
 
 	return nil
 }

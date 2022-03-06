@@ -23,6 +23,12 @@ func ClientCmd() *cli.Command {
 }
 
 func doClient(c *cli.Context) error {
+	readyChan := c.Context.Value("ready").(chan struct{})
+	select {
+	case <-readyChan:
+	case <-c.Context.Done():
+		return nil
+	}
 	client := c.Context.Value("client").(*host.Client)
 	return port.RunClient(c.Context, c.String("local-address"), client.CreateStream(port.ProtocolID))
 }

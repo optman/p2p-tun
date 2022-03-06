@@ -67,6 +67,7 @@ func NewClientNode(ctx context.Context, port int, seed int64) (host.Host, error)
 		return nil, err
 	}
 
+	//TODO: wait bootstrap ready
 	go bootstrap(ctx, h)
 
 	return h, nil

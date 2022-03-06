@@ -23,6 +23,13 @@ func ServerCmd() *cli.Command {
 }
 
 func doForward(c *cli.Context) error {
+	readyChan := c.Context.Value("ready").(chan struct{})
+	select {
+	case <-readyChan:
+	case <-c.Context.Done():
+		return nil
+	}
+
 	server := c.Context.Value("server").(*host.Server)
 	log := c.Context.Value("logger").(logging.StandardLogger)
 
