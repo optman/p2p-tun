@@ -1,14 +1,16 @@
 package cmd
 
 import (
+	"context"
 	"math/rand"
 	"time"
 
 	logging "github.com/ipfs/go-log/v2"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 var (
+	log     = logging.Logger("p2p-tun")
 	id_seed int64
 )
 
@@ -32,6 +34,8 @@ func Common(c *cli.Context) error {
 	}
 
 	logging.SetLogLevel("p2p-tun", "info")
+
+	c.Context = context.WithValue(c.Context, "logger", log)
 
 	return nil
 }

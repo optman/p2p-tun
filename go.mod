@@ -8,7 +8,7 @@ require (
 	github.com/libp2p/go-libp2p-core v0.13.0
 	github.com/libp2p/go-libp2p-kad-dht v0.15.0
 	github.com/multiformats/go-multiaddr v0.4.0
-	github.com/urfave/cli v1.22.1
+	github.com/urfave/cli/v2 v2.3.0
 )
 
 replace github.com/libp2p/go-libp2p v0.17.0 => github.com/optman/go-libp2p v0.17.1-0.20220224074507-81998574ff83

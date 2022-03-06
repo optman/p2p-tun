@@ -3,11 +3,15 @@ package port
 import (
 	"context"
 	"io"
-	"log"
 	"net"
 	"sync"
 
+	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p-core/protocol"
+)
+
+var (
+	log = logging.Logger("p2p-tun")
 )
 
 const ProtocolID = protocol.ID("/pfw")
@@ -40,7 +44,7 @@ func handle_stream(src io.ReadWriteCloser, forward_addr string) {
 
 	} else {
 		src.Close()
-		log.Println(err)
+		log.Warn(err)
 	}
 }
 
@@ -61,7 +65,7 @@ func RunClient(ctx context.Context, local_addr string, newStream NewStream) erro
 		return err
 	}
 
-	log.Println("client local_addr: ", ln.Addr())
+	log.Info("local_addr: ", ln.Addr())
 
 	for {
 		src, err := ln.Accept()
@@ -73,7 +77,7 @@ func RunClient(ctx context.Context, local_addr string, newStream NewStream) erro
 			dst, err := newStream(ctx)
 			if err != nil {
 				src.Close()
-				log.Println("stream open fail")
+				log.Warn("stream open fail")
 				return
 			}
 

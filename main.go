@@ -5,7 +5,7 @@ import (
 	"os"
 	"p2p-tun/cmd"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
@@ -13,9 +13,9 @@ func main() {
 	app := &cli.App{
 		Name:  "p2p-tun",
 		Flags: cmd.MainFlags,
-		Commands: []cli.Command{
-			cmd.Client(),
-			cmd.Server(),
+		Commands: []*cli.Command{
+			cmd.ClientCmd(),
+			cmd.ServerCmd(),
 		},
 		Before: cmd.Common,
 	}

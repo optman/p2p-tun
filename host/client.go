@@ -3,7 +3,6 @@ package host
 import (
 	"context"
 	"io"
-	"log"
 	"p2p-tun/host/p2p"
 	"time"
 
@@ -13,26 +12,26 @@ import (
 	"github.com/libp2p/go-libp2p-core/protocol"
 )
 
-type client struct {
+type Client struct {
 	h         host.Host
 	ctx       context.Context
 	target_id peer.ID
 }
 
-func NewClient(ctx context.Context, port int, seed int64) (*client, error) {
+func NewClient(ctx context.Context, port int, seed int64) (*Client, error) {
 
 	h, err := p2p.NewClientNode(ctx, port, seed)
 	if err != nil {
 		return nil, err
 	}
 
-	return &client{
+	return &Client{
 		h:   h,
 		ctx: ctx,
 	}, nil
 }
 
-func (self *client) Connect(id peer.ID) {
+func (self *Client) Connect(id peer.ID) {
 	self.target_id = id
 
 	ctx := self.ctx
@@ -68,7 +67,7 @@ func (self *client) Connect(id peer.ID) {
 
 }
 
-func (self *client) CreateStream(proto protocol.ID) func(context.Context) (io.ReadWriteCloser, error) {
+func (self *Client) CreateStream(proto protocol.ID) func(context.Context) (io.ReadWriteCloser, error) {
 	return func(ctx context.Context) (io.ReadWriteCloser, error) {
 
 		s, err := self.h.NewStream(ctx, self.target_id, proto)
@@ -76,7 +75,7 @@ func (self *client) CreateStream(proto protocol.ID) func(context.Context) (io.Re
 			return nil, err
 		}
 		if isRelayAddress(s.Conn().RemoteMultiaddr()) {
-			log.Println("through relay")
+			log.Info("through relay")
 		}
 
 		return s, nil

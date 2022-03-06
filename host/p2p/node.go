@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	log = logging.Logger("p2p")
+	log = logging.Logger("p2p-tun")
 )
 
 func NewServerNode(ctx context.Context, port int, seed int64) (host.Host, error) {

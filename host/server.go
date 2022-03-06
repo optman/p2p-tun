@@ -2,43 +2,48 @@ package host
 
 import (
 	"context"
+	"fmt"
 	"io"
-	"log"
 	"p2p-tun/host/p2p"
 	"time"
 
+	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p-core/event"
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/protocol"
 )
 
-type server struct {
+var (
+	log = logging.Logger("p2p-tun")
+)
+
+type Server struct {
 	h   host.Host
 	ctx context.Context
 }
 
-func NewServer(ctx context.Context, port int, seed int64) (*server, error) {
+func NewServer(ctx context.Context, port int, seed int64) (*Server, error) {
 	h, err := p2p.NewServerNode(ctx, port, seed)
 	if err != nil {
 		return nil, err
 	}
 
-	return &server{
+	return &Server{
 		h:   h,
 		ctx: ctx,
 	}, nil
 }
 
-func (self *server) Host() host.Host {
+func (self *Server) Host() host.Host {
 	return self.h
 }
 
-func (self *server) Start() {
+func (self *Server) Start() error {
 	subReachability, _ := self.h.EventBus().Subscribe(new(event.EvtLocalReachabilityChanged))
 	defer subReachability.Close()
 
-	log.Println("wait public or relay addresses ready...")
+	log.Info("wait public or relay addresses ready...")
 
 loop:
 	for {
@@ -48,7 +53,7 @@ loop:
 		select {
 		case ev, ok := <-subReachability.Out():
 			if !ok {
-				return
+				return fmt.Errorf("Unreachable!")
 			}
 			evt := ev.(event.EvtLocalReachabilityChanged)
 			if evt.Reachability == network.ReachabilityPublic {
@@ -57,14 +62,16 @@ loop:
 
 		case <-time.After(5 * time.Second):
 		case <-self.ctx.Done():
-			return
+			return nil
 		}
 	}
 
-	log.Println("ready be connect, addrs:", self.h.Addrs())
+	log.Info("ready be connect, addrs:", self.h.Addrs())
+
+	return nil
 }
 
-func (self *server) HandleStream(proto protocol.ID, f func(io.ReadWriteCloser)) {
+func (self *Server) HandleStream(proto protocol.ID, f func(io.ReadWriteCloser)) {
 	self.h.SetStreamHandler(proto, func(s network.Stream) {
 		f(s)
 	})
