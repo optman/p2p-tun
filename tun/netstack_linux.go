@@ -6,39 +6,15 @@ import (
 	"net"
 	"strings"
 
-	logging "github.com/ipfs/go-log/v2"
-	"github.com/libp2p/go-libp2p-core/protocol"
 	"gvisor.dev/gvisor/pkg/tcpip"
 	"gvisor.dev/gvisor/pkg/tcpip/adapters/gonet"
 	"gvisor.dev/gvisor/pkg/tcpip/link/fdbased"
-	"gvisor.dev/gvisor/pkg/tcpip/link/rawfile"
-	"gvisor.dev/gvisor/pkg/tcpip/link/tun"
 	"gvisor.dev/gvisor/pkg/tcpip/network/ipv4"
 	"gvisor.dev/gvisor/pkg/tcpip/network/ipv6"
 	"gvisor.dev/gvisor/pkg/tcpip/stack"
 	"gvisor.dev/gvisor/pkg/tcpip/transport/tcp"
 	"gvisor.dev/gvisor/pkg/waiter"
 )
-
-var (
-	log = logging.Logger("p2p-tun")
-)
-
-const ProtocolID = protocol.ID("/tun")
-
-func NewTun(tun_name string) (fd int, mtu uint32, err error) {
-	fd, err = tun.Open(tun_name)
-	if err != nil {
-		return
-	}
-
-	mtu, err = rawfile.GetMTU(tun_name)
-	if err != nil {
-		return
-	}
-
-	return
-}
 
 func NewNetstack(fd int, mtu uint32, tcp_stream_handler func(*net.TCPAddr, io.ReadWriteCloser)) error {
 
