@@ -1,10 +1,9 @@
 package tun
 
 import (
-	"p2p-tun/host"
+	"p2p-tun/cmd/context"
 	"p2p-tun/tun"
 
-	logging "github.com/ipfs/go-log/v2"
 	"github.com/urfave/cli/v2"
 )
 
@@ -18,27 +17,25 @@ func SocksCmd() *cli.Command {
 
 func startSocks5Server(c *cli.Context) error {
 
-	readyChan := c.Context.Value("ready").(chan struct{})
+	ctx := context.Context{c.Context}
+
 	select {
-	case <-readyChan:
-	case <-c.Context.Done():
+	case <-ctx.HostReady():
+	case <-ctx.Done():
 		return nil
 	}
 
-	server := c.Context.Value("server").(*host.Server)
-	log := c.Context.Value("logger").(logging.StandardLogger)
-
-	log.Info("start socks5 server")
+	ctx.Logger().Info("start socks5 server")
 
 	svr, err := newSocks5Server()
 	if err != nil {
 		return err
 	}
 
-	server.HandleStream(tun.ProtocolID, handleSocks5StreamFunc(c.Context, svr))
+	ctx.Server().HandleStream(tun.ProtocolID, handleSocks5StreamFunc(ctx, svr))
 
 	select {
-	case <-c.Context.Done():
+	case <-ctx.Done():
 	}
 
 	return nil

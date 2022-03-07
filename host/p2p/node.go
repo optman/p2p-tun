@@ -2,10 +2,10 @@ package p2p
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math/rand"
 	"sync"
+	"time"
 
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p"
@@ -67,36 +67,46 @@ func NewClientNode(ctx context.Context, port int, seed int64) (host.Host, error)
 		return nil, err
 	}
 
-	//TODO: wait bootstrap ready
 	go bootstrap(ctx, h)
 
 	return h, nil
 }
 
-func bootstrap(ctx context.Context, h host.Host) error {
-	w := sync.WaitGroup{}
-	success := 0
-	for _, p := range dht.DefaultBootstrapPeers {
-		p, _ := peer.AddrInfoFromP2pAddr(p)
-		w.Add(1)
-		go func() {
-			defer w.Done()
-			if err := h.Connect(ctx, *p); err == nil {
-				success += 1
-			}
-		}()
+func bootstrap(ctx context.Context, h host.Host) {
+
+	bootstrap := func() {
+		w := sync.WaitGroup{}
+		success := 0
+		for _, p := range dht.DefaultBootstrapPeers {
+			p, _ := peer.AddrInfoFromP2pAddr(p)
+			w.Add(1)
+			go func() {
+				defer w.Done()
+				if err := h.Connect(ctx, *p); err == nil {
+					success += 1
+				}
+			}()
+		}
+
+		w.Wait()
+
+		if success == 0 {
+			log.Error("bootstrap fail")
+		}
 	}
 
-	w.Wait()
+	//re-bootstrap after network recovery
+	for {
+		if len(h.Network().Conns()) < 1 {
+			bootstrap()
+		}
 
-	if success == 0 {
-		log.Error("bootstrap fail")
-		return errors.New("bootstrap fail")
+		select {
+		case <-time.After(5 * time.Minute):
+		case <-ctx.Done():
+			return
+		}
 	}
-
-	//TODO: re-bootstrap after network recovery
-
-	return nil
 }
 
 func listen_addrs(port int) []string {

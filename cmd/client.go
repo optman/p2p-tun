@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
+	"p2p-tun/cmd/context"
 	"p2p-tun/cmd/port"
 	"p2p-tun/cmd/tun"
 	"p2p-tun/host"
@@ -52,8 +52,8 @@ func connect(c *cli.Context) error {
 		close(readyChan)
 	}()
 
-	c.Context = context.WithValue(c.Context, "client", client)
-	c.Context = context.WithValue(c.Context, "ready", readyChan)
+	c.Context = context.SetClient(c.Context, client)
+	c.Context = context.SetHostReady(c.Context, readyChan)
 
 	return nil
 }

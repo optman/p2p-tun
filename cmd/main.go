@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"context"
 	"math/rand"
+	"p2p-tun/cmd/context"
 	"time"
 
 	logging "github.com/ipfs/go-log/v2"
@@ -35,7 +35,7 @@ func Common(c *cli.Context) error {
 
 	logging.SetLogLevel("p2p-tun", "info")
 
-	c.Context = context.WithValue(c.Context, "logger", log)
+	c.Context = context.SetLogger(c.Context, log)
 
 	return nil
 }

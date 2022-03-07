@@ -1,7 +1,7 @@
 package port
 
 import (
-	"p2p-tun/host"
+	"p2p-tun/cmd/context"
 	"p2p-tun/port"
 
 	"github.com/urfave/cli/v2"
@@ -23,12 +23,11 @@ func ClientCmd() *cli.Command {
 }
 
 func doClient(c *cli.Context) error {
-	readyChan := c.Context.Value("ready").(chan struct{})
+	ctx := context.Context{c.Context}
 	select {
-	case <-readyChan:
-	case <-c.Context.Done():
+	case <-ctx.HostReady():
+	case <-ctx.Done():
 		return nil
 	}
-	client := c.Context.Value("client").(*host.Client)
-	return port.RunClient(c.Context, c.String("local-address"), client.CreateStream(port.ProtocolID))
+	return port.RunClient(ctx, c.String("local-address"), ctx.Client().CreateStream(port.ProtocolID))
 }

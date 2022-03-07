@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"context"
+	"p2p-tun/cmd/context"
 	"p2p-tun/cmd/port"
 	"p2p-tun/cmd/tun"
 	"p2p-tun/host"
@@ -39,8 +39,8 @@ func startServer(c *cli.Context) error {
 		close(readyChan)
 	}()
 
-	c.Context = context.WithValue(c.Context, "server", server)
-	c.Context = context.WithValue(c.Context, "ready", readyChan)
+	c.Context = context.SetServer(c.Context, server)
+	c.Context = context.SetHostReady(c.Context, readyChan)
 
 	return nil
 }

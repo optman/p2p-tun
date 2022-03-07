@@ -1,10 +1,9 @@
 package port
 
 import (
-	"p2p-tun/host"
+	"p2p-tun/cmd/context"
 	"p2p-tun/port"
 
-	logging "github.com/ipfs/go-log/v2"
 	"github.com/urfave/cli/v2"
 )
 
@@ -23,22 +22,19 @@ func ServerCmd() *cli.Command {
 }
 
 func doForward(c *cli.Context) error {
-	readyChan := c.Context.Value("ready").(chan struct{})
+	ctx := context.Context{c.Context}
 	select {
-	case <-readyChan:
-	case <-c.Context.Done():
+	case <-ctx.HostReady():
+	case <-ctx.Done():
 		return nil
 	}
 
-	server := c.Context.Value("server").(*host.Server)
-	log := c.Context.Value("logger").(logging.StandardLogger)
+	ctx.Logger().Info("forward-addr:", c.String("forward-addr"))
 
-	log.Info("forward-addr:", c.String("forward-addr"))
-
-	server.HandleStream(port.ProtocolID, port.HandleStream(c.String("forward-addr")))
+	ctx.Server().HandleStream(port.ProtocolID, port.HandleStream(c.String("forward-addr")))
 
 	select {
-	case <-c.Context.Done():
+	case <-ctx.Done():
 	}
 
 	return nil

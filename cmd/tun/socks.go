@@ -54,12 +54,9 @@ func newSocks5Server() (*socks5.Server, error) {
 }
 
 type fake_conn struct {
-	conn io.ReadWriteCloser
+	io.ReadWriteCloser
 }
 
-func (c *fake_conn) Read(b []byte) (n int, err error)   { return c.conn.Read(b) }
-func (c *fake_conn) Write(b []byte) (n int, err error)  { return c.conn.Write(b) }
-func (c *fake_conn) Close() error                       { return c.conn.Close() }
 func (c *fake_conn) LocalAddr() net.Addr                { return nil }
 func (c *fake_conn) RemoteAddr() net.Addr               { return nil }
 func (c *fake_conn) SetDeadline(t time.Time) error      { return nil }
