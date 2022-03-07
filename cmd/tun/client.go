@@ -18,7 +18,7 @@ func TunCmd() *cli.Command {
 			&cli.StringFlag{
 				Name:  "tun-name",
 				Usage: "tun interface name",
-				Value: "tun0",
+				Value: "",
 			},
 		},
 		Action: startTun,
@@ -27,17 +27,19 @@ func TunCmd() *cli.Command {
 
 func startTun(c *cli.Context) error {
 
+	fd, mtu, err := tun.NewTun(c.String("tun-name"))
+	if err != nil {
+		return err
+	}
+
 	ctx := context.Context{c.Context}
-
-	//TODO: setup tun
-
 	select {
 	case <-ctx.HostReady():
 	case <-ctx.Done():
 		return nil
 	}
-	//TODO: setup netstack
-	if err := tun.SetupTun(c.String("tun-name"), handleStreamFunc(ctx)); err != nil {
+
+	if err := tun.NewNetstack(fd, mtu, handleStreamFunc(ctx)); err != nil {
 		return err
 	}
 

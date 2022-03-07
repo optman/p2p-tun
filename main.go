@@ -12,6 +12,7 @@ func main() {
 
 	app := &cli.App{
 		Name:  "p2p-tun",
+		Usage: "port forward and tun2socks through libp2p",
 		Flags: cmd.MainFlags,
 		Commands: []*cli.Command{
 			cmd.ClientCmd(),

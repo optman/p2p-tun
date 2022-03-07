@@ -11,6 +11,7 @@ import (
 	"gvisor.dev/gvisor/pkg/tcpip"
 	"gvisor.dev/gvisor/pkg/tcpip/adapters/gonet"
 	"gvisor.dev/gvisor/pkg/tcpip/link/fdbased"
+	"gvisor.dev/gvisor/pkg/tcpip/link/rawfile"
 	"gvisor.dev/gvisor/pkg/tcpip/link/tun"
 	"gvisor.dev/gvisor/pkg/tcpip/network/ipv4"
 	"gvisor.dev/gvisor/pkg/tcpip/network/ipv6"
@@ -25,16 +26,25 @@ var (
 
 const ProtocolID = protocol.ID("/tun")
 
-func SetupTun(tun_name string, tcp_stream_handler func(*net.TCPAddr, io.ReadWriteCloser)) error {
-
-	fd, err := tun.Open(tun_name)
+func NewTun(tun_name string) (fd int, mtu uint32, err error) {
+	fd, err = tun.Open(tun_name)
 	if err != nil {
-		return err
+		return
 	}
+
+	mtu, err = rawfile.GetMTU(tun_name)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func NewNetstack(fd int, mtu uint32, tcp_stream_handler func(*net.TCPAddr, io.ReadWriteCloser)) error {
 
 	linkEP, err := fdbased.New(&fdbased.Options{
 		FDs: []int{fd},
-		MTU: 1500,
+		MTU: mtu,
 	})
 	if err != nil {
 		return err
