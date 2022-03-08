@@ -25,6 +25,15 @@ var MainFlags = []cli.Flag{
 		Usage: "p2p listen port",
 		Value: 0,
 	},
+	&cli.StringFlag{
+		Name:  "secret",
+		Usage: "authenticate user",
+		Value: "",
+	},
+	&cli.BoolFlag{
+		Name:  "debug",
+		Usage: "log debug",
+	},
 }
 
 func Common(c *cli.Context) error {
@@ -33,7 +42,11 @@ func Common(c *cli.Context) error {
 		id_seed = rand.New(rand.NewSource(time.Now().UnixNano())).Int63()
 	}
 
-	logging.SetLogLevel("p2p-tun", "info")
+	logLevel := "info"
+	if c.Bool("debug") {
+		logLevel = "debug"
+	}
+	logging.SetLogLevel("p2p-tun", logLevel)
 
 	c.Context = context.SetLogger(c.Context, log)
 

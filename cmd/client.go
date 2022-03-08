@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"p2p-tun/auth"
 	"p2p-tun/cmd/context"
 	"p2p-tun/cmd/port"
 	"p2p-tun/cmd/tun"
@@ -36,8 +37,19 @@ func connect(c *cli.Context) error {
 		return fmt.Errorf("invalid server id, %s", err)
 	}
 
+	conf := host.ClientConfig{
+		Ctx:  c.Context,
+		Port: c.Int("listen-port"),
+		Seed: id_seed,
+	}
+
+	secret := c.String("secret")
+	if len(secret) > 0 {
+		conf.Auth = auth.NewAuthenticator(secret)
+	}
+
 	log.Info("connecting")
-	client, err := host.NewClient(c.Context, c.Int("listen-port"), id_seed)
+	client, err := host.NewClient(conf)
 	if err != nil {
 		panic(err)
 	}

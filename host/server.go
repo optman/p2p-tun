@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"p2p-tun/auth"
 	"p2p-tun/host/p2p"
 	"time"
 
@@ -18,20 +19,29 @@ var (
 	log = logging.Logger("p2p-tun")
 )
 
-type Server struct {
-	h   host.Host
-	ctx context.Context
+type ServerConfig struct {
+	Ctx  context.Context
+	Port int
+	Seed int64
+	Auth *auth.Authenticator
 }
 
-func NewServer(ctx context.Context, port int, seed int64) (*Server, error) {
-	h, err := p2p.NewServerNode(ctx, port, seed)
+type Server struct {
+	h    host.Host
+	ctx  context.Context
+	auth *auth.Authenticator
+}
+
+func NewServer(conf ServerConfig) (*Server, error) {
+	h, err := p2p.NewServerNode(conf.Ctx, conf.Port, conf.Seed)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Server{
-		h:   h,
-		ctx: ctx,
+		h:    h,
+		ctx:  conf.Ctx,
+		auth: conf.Auth,
 	}, nil
 }
 
@@ -73,6 +83,13 @@ loop:
 
 func (self *Server) HandleStream(proto protocol.ID, f func(io.ReadWriteCloser)) {
 	self.h.SetStreamHandler(proto, func(s network.Stream) {
+		if self.auth != nil {
+			if ok, err := self.auth.Read(s); err != nil || !ok {
+				log.Warnf("authenticate %s fail!", s.Conn().RemotePeer())
+				s.Close()
+				return
+			}
+		}
 		f(s)
 	})
 }

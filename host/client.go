@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"p2p-tun/auth"
 	"p2p-tun/host/p2p"
 	"time"
 
@@ -17,18 +18,27 @@ type Client struct {
 	h         host.Host
 	ctx       context.Context
 	target_id peer.ID
+	auth      *auth.Authenticator
 }
 
-func NewClient(ctx context.Context, port int, seed int64) (*Client, error) {
+type ClientConfig struct {
+	Ctx  context.Context
+	Port int
+	Seed int64
+	Auth *auth.Authenticator
+}
 
-	h, err := p2p.NewClientNode(ctx, port, seed)
+func NewClient(conf ClientConfig) (*Client, error) {
+
+	h, err := p2p.NewClientNode(conf.Ctx, conf.Port, conf.Seed)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Client{
-		h:   h,
-		ctx: ctx,
+		h:    h,
+		ctx:  conf.Ctx,
+		auth: conf.Auth,
 	}, nil
 }
 
@@ -78,6 +88,12 @@ func (self *Client) CreateStream(proto protocol.ID) func(context.Context) (io.Re
 		}
 		if isRelayAddress(s.Conn().RemoteMultiaddr()) {
 			log.Info("through relay")
+		}
+
+		if self.auth != nil {
+			if err := self.auth.Write(s); err != nil {
+				return nil, err
+			}
 		}
 
 		return s, nil
