@@ -84,6 +84,8 @@ func bootstrap(ctx context.Context, h host.Host) {
 				defer w.Done()
 				if err := h.Connect(ctx, *p); err == nil {
 					success += 1
+				} else {
+					log.Debugf("connect bootstrap node %s fail: %s", p.ID, err)
 				}
 			}()
 		}

@@ -19,12 +19,6 @@ func startSocks5Server(c *cli.Context) error {
 
 	ctx := context.Context{c.Context}
 
-	select {
-	case <-ctx.HostReady():
-	case <-ctx.Done():
-		return nil
-	}
-
 	ctx.Logger().Info("start socks5 server")
 
 	svr, err := newSocks5Server()
