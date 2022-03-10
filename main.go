@@ -11,14 +11,10 @@ import (
 func main() {
 
 	app := &cli.App{
-		Name:  "p2p-tun",
-		Usage: "port forward and tun2socks through libp2p",
-		Flags: cmd.MainFlags,
-		Commands: []*cli.Command{
-			cmd.ClientCmd(),
-			cmd.ServerCmd(),
-		},
-		Before: cmd.Common,
+		Name:     "p2p-tun",
+		Usage:    "port forward and tun2socks through libp2p",
+		Flags:    cmd.Flags,
+		Commands: cmd.Commands,
 	}
 
 	err := app.Run(os.Args)

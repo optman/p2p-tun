@@ -3,7 +3,6 @@ package p2p
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"sync"
 	"time"
 
@@ -22,11 +21,11 @@ var (
 	log = logging.Logger("p2p-tun")
 )
 
-func NewServerNode(ctx context.Context, port int, seed int64) (host.Host, error) {
+func NewServerNode(ctx context.Context, port int, privKey crypto.PrivKey) (host.Host, error) {
 
 	h, err := libp2p.New(
 		libp2p.ListenAddrStrings(listen_addrs(port)...),
-		libp2p.Identity(crypto_key(seed)),
+		libp2p.Identity(privKey),
 		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
 			return dht.New(ctx, h, dht.Mode(dht.ModeClient))
 		}),
@@ -52,10 +51,10 @@ func NewServerNode(ctx context.Context, port int, seed int64) (host.Host, error)
 	return h, nil
 }
 
-func NewClientNode(ctx context.Context, port int, seed int64) (host.Host, error) {
+func NewClientNode(ctx context.Context, port int, privKey crypto.PrivKey) (host.Host, error) {
 
 	h, err := libp2p.New(
-		libp2p.Identity(crypto_key(seed)),
+		libp2p.Identity(privKey),
 		libp2p.ListenAddrStrings(listen_addrs(port)...),
 		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
 			return dht.New(ctx, h, dht.Mode(dht.ModeClient))
@@ -124,13 +123,4 @@ func listen_addrs(port int) []string {
 	}
 
 	return addrs
-}
-
-func crypto_key(seed int64) crypto.PrivKey {
-	r := rand.New(rand.NewSource(seed))
-	priv, _, err := crypto.GenerateKeyPairWithReader(crypto.Ed25519, -1, r)
-	if err != nil {
-		panic(err)
-	}
-	return priv
 }

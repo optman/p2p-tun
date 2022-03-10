@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"p2p-tun/auth"
 	"p2p-tun/cmd/context"
 	"p2p-tun/cmd/port"
 	"p2p-tun/cmd/tun"
@@ -20,6 +19,7 @@ func ClientCmd() *cli.Command {
 			&cli.StringFlag{
 				Name:     "server-id",
 				Usage:    "server peer id",
+				EnvVars:  []string{"SERVER_ID"},
 				Required: true,
 			},
 		},
@@ -27,29 +27,27 @@ func ClientCmd() *cli.Command {
 			port.ClientCmd(),
 			tun.TunCmd(),
 		},
-		Before: connect,
+		Before: func(c *cli.Context) error {
+			if err := common(c); err != nil {
+				return err
+			}
+
+			return connect(c)
+		},
 	}
 }
 
 func connect(c *cli.Context) error {
+	ctx := context.Context{c.Context}
+	conf := ctx.NodeConfig()
+
 	server_id, err := peer.Decode(c.String("server-id"))
 	if err != nil {
 		return fmt.Errorf("invalid server id, %s", err)
 	}
 
-	conf := host.ClientConfig{
-		Ctx:  c.Context,
-		Port: c.Int("listen-port"),
-		Seed: id_seed,
-	}
-
-	secret := c.String("secret")
-	if len(secret) > 0 {
-		conf.Auth = auth.NewAuthenticator(secret)
-	}
-
 	log.Info("connecting")
-	client, err := host.NewClient(conf)
+	client, err := host.NewClient(c.Context, conf)
 	if err != nil {
 		panic(err)
 	}

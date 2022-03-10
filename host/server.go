@@ -19,28 +19,21 @@ var (
 	log = logging.Logger("p2p-tun")
 )
 
-type ServerConfig struct {
-	Ctx  context.Context
-	Port int
-	Seed int64
-	Auth *auth.Authenticator
-}
-
 type Server struct {
 	h    host.Host
 	ctx  context.Context
 	auth *auth.Authenticator
 }
 
-func NewServer(conf ServerConfig) (*Server, error) {
-	h, err := p2p.NewServerNode(conf.Ctx, conf.Port, conf.Seed)
+func NewServer(ctx context.Context, conf *NodeConfig) (*Server, error) {
+	h, err := p2p.NewServerNode(ctx, conf.ListenPort, conf.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Server{
 		h:    h,
-		ctx:  conf.Ctx,
+		ctx:  ctx,
 		auth: conf.Auth,
 	}, nil
 }

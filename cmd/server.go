@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"p2p-tun/auth"
 	"p2p-tun/cmd/context"
 	"p2p-tun/cmd/port"
 	"p2p-tun/cmd/tun"
@@ -18,25 +17,25 @@ func ServerCmd() *cli.Command {
 			port.ServerCmd(),
 			tun.SocksCmd(),
 		},
-		Before: startServer,
+		Before: func(c *cli.Context) error {
+			if err := common(c); err != nil {
+				return err
+			}
+
+			return startServer(c)
+		},
 	}
 }
 
 func startServer(c *cli.Context) error {
-	conf := host.ServerConfig{
-		Ctx:  c.Context,
-		Port: c.Int("listen-port"),
-		Seed: id_seed,
-	}
+	ctx := context.Context{c.Context}
+	conf := ctx.NodeConfig()
 
-	secret := c.String("secret")
-	if len(secret) == 0 {
+	if conf.Auth == nil {
 		log.Warn("Danger!!! No secret set!!!")
-	} else {
-		conf.Auth = auth.NewAuthenticator(secret)
 	}
 
-	server, err := host.NewServer(conf)
+	server, err := host.NewServer(c.Context, conf)
 	if err != nil {
 		return err
 	}

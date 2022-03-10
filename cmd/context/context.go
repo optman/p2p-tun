@@ -11,6 +11,7 @@ type loggerKey struct{}
 type hostReadyKey struct{}
 type clientKey struct{}
 type serverKey struct{}
+type nodeConfigKey struct{}
 
 type Context struct {
 	context.Context
@@ -46,4 +47,12 @@ func SetServer(ctx context.Context, v *host.Server) context.Context {
 
 func (ctx *Context) Server() *host.Server {
 	return ctx.Value(serverKey{}).(*host.Server)
+}
+
+func SetNodeConfig(ctx context.Context, v *host.NodeConfig) context.Context {
+	return context.WithValue(ctx, nodeConfigKey{}, v)
+}
+
+func (ctx *Context) NodeConfig() *host.NodeConfig {
+	return ctx.Value(nodeConfigKey{}).(*host.NodeConfig)
 }

@@ -21,23 +21,16 @@ type Client struct {
 	auth      *auth.Authenticator
 }
 
-type ClientConfig struct {
-	Ctx  context.Context
-	Port int
-	Seed int64
-	Auth *auth.Authenticator
-}
+func NewClient(ctx context.Context, conf *NodeConfig) (*Client, error) {
 
-func NewClient(conf ClientConfig) (*Client, error) {
-
-	h, err := p2p.NewClientNode(conf.Ctx, conf.Port, conf.Seed)
+	h, err := p2p.NewClientNode(ctx, conf.ListenPort, conf.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Client{
 		h:    h,
-		ctx:  conf.Ctx,
+		ctx:  ctx,
 		auth: conf.Auth,
 	}, nil
 }
