@@ -1,8 +1,8 @@
 package port
 
 import (
-	"p2p-tun/cmd/context"
-	"p2p-tun/port"
+	"github.com/optman/p2p-tun/cmd/context"
+	"github.com/optman/p2p-tun/port"
 
 	"github.com/urfave/cli/v2"
 )

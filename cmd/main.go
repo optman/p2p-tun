@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"p2p-tun/auth"
-	"p2p-tun/cmd/context"
-	"p2p-tun/host"
+	"github.com/optman/p2p-tun/auth"
+	"github.com/optman/p2p-tun/cmd/context"
+	"github.com/optman/p2p-tun/host"
 
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p-core/crypto"

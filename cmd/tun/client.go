@@ -3,9 +3,9 @@ package tun
 import (
 	"io"
 	"net"
-	"p2p-tun/cmd/context"
-	"p2p-tun/tun"
-	"p2p-tun/util"
+	"github.com/optman/p2p-tun/cmd/context"
+	"github.com/optman/p2p-tun/tun"
+	"github.com/optman/p2p-tun/util"
 
 	"github.com/urfave/cli/v2"
 )

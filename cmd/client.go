@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"p2p-tun/cmd/context"
-	"p2p-tun/cmd/port"
-	"p2p-tun/cmd/tun"
-	"p2p-tun/host"
+	"github.com/optman/p2p-tun/cmd/context"
+	"github.com/optman/p2p-tun/cmd/port"
+	"github.com/optman/p2p-tun/cmd/tun"
+	"github.com/optman/p2p-tun/host"
 
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/urfave/cli/v2"

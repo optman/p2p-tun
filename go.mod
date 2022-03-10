@@ -1,4 +1,4 @@
-module p2p-tun
+module github.com/optman/p2p-tun
 
 go 1.17
 

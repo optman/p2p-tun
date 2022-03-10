@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"p2p-tun/cmd"
+	"github.com/optman/p2p-tun/cmd"
 
 	"github.com/urfave/cli/v2"
 )

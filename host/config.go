@@ -1,7 +1,7 @@
 package host
 
 import (
-	"p2p-tun/auth"
+	"github.com/optman/p2p-tun/auth"
 
 	"github.com/libp2p/go-libp2p-core/crypto"
 )

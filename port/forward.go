@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 	"net"
-	"p2p-tun/util"
+	"github.com/optman/p2p-tun/util"
 
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p-core/protocol"

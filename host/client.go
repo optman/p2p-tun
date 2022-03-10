@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"p2p-tun/auth"
-	"p2p-tun/host/p2p"
+	"github.com/optman/p2p-tun/auth"
+	"github.com/optman/p2p-tun/host/p2p"
 	"time"
 
 	"github.com/libp2p/go-libp2p-core/host"
