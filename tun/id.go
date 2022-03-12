@@ -9,4 +9,5 @@ var (
 	log = logging.Logger("p2p-tun")
 )
 
-const ProtocolID = protocol.ID("/tun")
+const TcpProtocolID = protocol.ID("/tun/tcp")
+const UdpProtocolID = protocol.ID("/tun/udp")

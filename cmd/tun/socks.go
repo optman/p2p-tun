@@ -2,7 +2,6 @@ package tun
 
 import (
 	"bytes"
-	"context"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -10,7 +9,11 @@ import (
 	"time"
 
 	"github.com/armon/go-socks5"
+	"github.com/optman/p2p-tun/cmd/context"
+	"github.com/optman/p2p-tun/host"
 )
+
+const UDPTIMEOUT time.Duration = 30 * time.Second
 
 func socksConnect(conn io.ReadWriter, target_addr *net.TCPAddr) error {
 	conn.Write([]byte{0x05, 0x01, 0x00})
@@ -41,9 +44,68 @@ func socksConnect(conn io.ReadWriter, target_addr *net.TCPAddr) error {
 	return nil
 }
 
-func handleSocks5StreamFunc(ctx context.Context, svr *socks5.Server) func(conn io.ReadWriteCloser) {
+func socksConnect2(conn io.ReadWriter, ip net.IP, port int) error {
+	buf := &bytes.Buffer{}
+	binary.Write(buf, binary.BigEndian, ip)
+	binary.Write(buf, binary.BigEndian, uint16(port))
+	_, err := conn.Write(buf.Bytes())
+	return err
+}
 
-	return func(conn io.ReadWriteCloser) {
+func handleSocks5UdpStreamFunc(ctx context.Context) func(conn host.Stream) {
+
+	log := ctx.Logger()
+
+	return func(src host.Stream) {
+
+		src.SetDeadline(time.Now().Add(UDPTIMEOUT))
+
+		head := make([]byte, 6)
+		if _, err := io.ReadAtLeast(src, head, len(head)); err != nil {
+			return
+		}
+		addr := net.UDPAddr{
+			IP:   net.IP(head[:4]),
+			Port: int(binary.BigEndian.Uint16(head[4:6])),
+		}
+
+		log.Debug("tcp ", addr)
+
+		buf, err := io.ReadAll(src)
+		if err != nil {
+			return
+		}
+
+		dst, err := net.Dial("udp", addr.String())
+		if err != nil {
+			return
+		}
+
+		if _, err := dst.Write(buf); err != nil {
+			return
+		}
+
+		dst.SetDeadline(time.Now().Add(UDPTIMEOUT))
+
+		buf = make([]byte, 4096)
+		var n int
+		n, err = dst.Read(buf)
+		if err != nil {
+			return
+		}
+
+		if _, err := src.Write(buf[:n]); err != nil {
+			return
+		}
+
+		src.CloseWrite()
+	}
+
+}
+
+func handleSocks5TcpStreamFunc(ctx context.Context, svr *socks5.Server) func(conn host.Stream) {
+
+	return func(conn host.Stream) {
 		svr.ServeConn(&fake_conn{conn})
 	}
 }

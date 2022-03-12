@@ -2,7 +2,6 @@ package tun
 
 import (
 	"fmt"
-	"io"
 	"net"
 	"strings"
 
@@ -13,10 +12,12 @@ import (
 	"gvisor.dev/gvisor/pkg/tcpip/network/ipv6"
 	"gvisor.dev/gvisor/pkg/tcpip/stack"
 	"gvisor.dev/gvisor/pkg/tcpip/transport/tcp"
+	"gvisor.dev/gvisor/pkg/tcpip/transport/udp"
 	"gvisor.dev/gvisor/pkg/waiter"
 )
 
-func NewNetstack(fd int, mtu uint32, tcp_stream_handler func(*net.TCPAddr, io.ReadWriteCloser)) error {
+func NewNetstack(fd int, mtu uint32, tcpConnHandler func(*net.TCPAddr, Stream),
+	udpConnHandler func(*net.UDPAddr, Stream)) error {
 
 	linkEP, err := fdbased.New(&fdbased.Options{
 		FDs: []int{fd},
@@ -28,7 +29,7 @@ func NewNetstack(fd int, mtu uint32, tcp_stream_handler func(*net.TCPAddr, io.Re
 
 	s := stack.New(stack.Options{
 		NetworkProtocols:   []stack.NetworkProtocolFactory{ipv4.NewProtocol, ipv6.NewProtocol},
-		TransportProtocols: []stack.TransportProtocolFactory{tcp.NewProtocol}})
+		TransportProtocols: []stack.TransportProtocolFactory{tcp.NewProtocol, udp.NewProtocol}})
 
 	if err := s.CreateNIC(1, linkEP); err != nil {
 		return fmt.Errorf("create nic fail %v", err)
@@ -66,12 +67,25 @@ func NewNetstack(fd int, mtu uint32, tcp_stream_handler func(*net.TCPAddr, io.Re
 		r.Complete(false)
 
 		conn := gonet.NewTCPConn(&wq, ep)
-		defer conn.Close()
 
-		tcp_stream_handler(conn.LocalAddr().(*net.TCPAddr), conn)
+		go tcpConnHandler(conn.LocalAddr().(*net.TCPAddr), conn)
+	})
+
+	udpFwd := udp.NewForwarder(s, func(r *udp.ForwarderRequest) {
+		var wq waiter.Queue
+		ep, err := r.CreateEndpoint(&wq)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		conn := gonet.NewUDPConn(s, &wq, ep)
+
+		go udpConnHandler(conn.LocalAddr().(*net.UDPAddr), conn)
 	})
 
 	s.SetTransportProtocolHandler(tcp.ProtocolNumber, tcpFwd.HandlePacket)
+	s.SetTransportProtocolHandler(udp.ProtocolNumber, udpFwd.HandlePacket)
 
 	return nil
 }

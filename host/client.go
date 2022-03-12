@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"time"
+
 	"github.com/optman/p2p-tun/auth"
 	"github.com/optman/p2p-tun/host/p2p"
-	"time"
 
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/network"
@@ -19,6 +20,14 @@ type Client struct {
 	ctx       context.Context
 	target_id peer.ID
 	auth      *auth.Authenticator
+}
+
+type Stream interface {
+	io.Reader
+	io.Writer
+	io.Closer
+	CloseWrite() error
+	SetDeadline(time.Time) error
 }
 
 func NewClient(ctx context.Context, conf *NodeConfig) (*Client, error) {
@@ -72,8 +81,8 @@ func (self *Client) Connect(id peer.ID) error {
 	return nil
 }
 
-func (self *Client) CreateStream(proto protocol.ID) func(context.Context) (io.ReadWriteCloser, error) {
-	return func(ctx context.Context) (io.ReadWriteCloser, error) {
+func (self *Client) CreateStream(proto protocol.ID) func(context.Context) (Stream, error) {
+	return func(ctx context.Context) (Stream, error) {
 
 		s, err := self.h.NewStream(ctx, self.target_id, proto)
 		if err != nil {

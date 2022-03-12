@@ -4,6 +4,8 @@ import (
 	"context"
 	"io"
 	"net"
+
+	"github.com/optman/p2p-tun/host"
 	"github.com/optman/p2p-tun/util"
 
 	logging "github.com/ipfs/go-log/v2"
@@ -27,15 +29,15 @@ func handle_stream(src io.ReadWriteCloser, forward_addr string) {
 	}
 }
 
-func HandleStream(forward_addr string) func(s io.ReadWriteCloser) {
+func HandleStream(forward_addr string) func(s host.Stream) {
 
-	return func(s io.ReadWriteCloser) {
+	return func(s host.Stream) {
 		handle_stream(s, forward_addr)
 	}
 
 }
 
-type NewStream func(ctx context.Context) (io.ReadWriteCloser, error)
+type NewStream func(ctx context.Context) (host.Stream, error)
 
 func RunClient(ctx context.Context, local_addr string, newStream NewStream) error {
 
@@ -53,12 +55,16 @@ func RunClient(ctx context.Context, local_addr string, newStream NewStream) erro
 		}
 
 		go func() {
+			defer src.Close()
+
 			dst, err := newStream(ctx)
 			if err != nil {
 				src.Close()
 				log.Warn("stream open fail")
 				return
 			}
+
+			defer dst.Close()
 
 			util.ConcatStream(src, dst)
 

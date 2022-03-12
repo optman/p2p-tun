@@ -3,6 +3,8 @@ package tun
 import (
 	"io"
 	"net"
+	"time"
+
 	"github.com/optman/p2p-tun/cmd/context"
 	"github.com/optman/p2p-tun/tun"
 	"github.com/optman/p2p-tun/util"
@@ -39,7 +41,7 @@ func startTun(c *cli.Context) error {
 		return nil
 	}
 
-	if err := tun.NewNetstack(fd, mtu, handleStreamFunc(ctx)); err != nil {
+	if err := tun.NewNetstack(fd, mtu, handleTcpConn(ctx), handleUdpConn(ctx)); err != nil {
 		return err
 	}
 
@@ -53,24 +55,73 @@ func startTun(c *cli.Context) error {
 	return nil
 }
 
-func handleStreamFunc(ctx context.Context) func(target_addr *net.TCPAddr, src io.ReadWriteCloser) {
+func handleTcpConn(ctx context.Context) func(target_addr *net.TCPAddr, src tun.Stream) {
 
-	createStream := ctx.Client().CreateStream(tun.ProtocolID)
+	createStream := ctx.Client().CreateStream(tun.TcpProtocolID)
 	log := ctx.Logger()
 
-	return func(target_addr *net.TCPAddr, src io.ReadWriteCloser) {
+	return func(target_addr *net.TCPAddr, src tun.Stream) {
+		defer src.Close()
+
+		log.Debug("tcp ", target_addr)
+
 		dst, err := createStream(ctx)
 		if err != nil {
-			log.Debug("create socks stream fail ", err)
 			return
 		}
 		defer dst.Close()
 
 		if err := socksConnect(dst, target_addr); err != nil {
-			log.Debugf("socks connect %v fail", target_addr)
 			return
 		}
 
 		util.ConcatStream(src, dst)
+	}
+}
+
+func handleUdpConn(ctx context.Context) func(target_addr *net.UDPAddr, src tun.Stream) {
+
+	createStream := ctx.Client().CreateStream(tun.UdpProtocolID)
+	log := ctx.Logger()
+
+	return func(target_addr *net.UDPAddr, src tun.Stream) {
+		defer src.Close()
+
+		log.Debug("udp ", target_addr)
+
+		src.SetDeadline(time.Now().Add(UDPTIMEOUT))
+
+		dst, err := createStream(ctx)
+		if err != nil {
+			return
+		}
+		defer dst.Close()
+
+		dst.SetDeadline(time.Now().Add(UDPTIMEOUT))
+
+		if err := socksConnect2(dst, target_addr.IP, target_addr.Port); err != nil {
+			return
+		}
+
+		buf := make([]byte, 4096)
+		n, err := src.Read(buf)
+		if err != nil {
+			return
+		}
+
+		if _, err := dst.Write(buf[:n]); err != nil {
+			return
+		}
+
+		dst.CloseWrite()
+
+		resp, err := io.ReadAll(dst)
+		if err != nil {
+			return
+		}
+
+		if _, err := src.Write(resp); err != nil {
+			return
+		}
 	}
 }

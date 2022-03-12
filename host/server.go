@@ -3,10 +3,10 @@ package host
 import (
 	"context"
 	"fmt"
-	"io"
+	"time"
+
 	"github.com/optman/p2p-tun/auth"
 	"github.com/optman/p2p-tun/host/p2p"
-	"time"
 
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p-core/event"
@@ -74,7 +74,7 @@ loop:
 	return nil
 }
 
-func (self *Server) HandleStream(proto protocol.ID, f func(io.ReadWriteCloser)) {
+func (self *Server) HandleStream(proto protocol.ID, f func(Stream)) {
 	self.h.SetStreamHandler(proto, func(s network.Stream) {
 		if self.auth != nil {
 			if ok, err := self.auth.Read(s); err != nil || !ok {

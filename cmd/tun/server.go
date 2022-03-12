@@ -26,7 +26,8 @@ func startSocks5Server(c *cli.Context) error {
 		return err
 	}
 
-	ctx.Server().HandleStream(tun.ProtocolID, handleSocks5StreamFunc(ctx, svr))
+	ctx.Server().HandleStream(tun.TcpProtocolID, handleSocks5TcpStreamFunc(ctx, svr))
+	ctx.Server().HandleStream(tun.UdpProtocolID, handleSocks5UdpStreamFunc(ctx))
 
 	select {
 	case <-ctx.Done():
