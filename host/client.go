@@ -89,7 +89,7 @@ func (self *Client) CreateStream(proto protocol.ID) func(context.Context) (Strea
 			return nil, err
 		}
 		if isRelayAddress(s.Conn().RemoteMultiaddr()) {
-			log.Info("through relay")
+			log.Debug("through relay")
 		}
 
 		if self.auth != nil {

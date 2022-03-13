@@ -52,7 +52,9 @@ $ curl localhost:8888
 
 ### tun2socks
 
-tunnel tcp connection to remote built-in socks5 server (Full Access To Remote Network)
+tunnel tcp/udp to remote built-in socks5 server 
+
+udp only support request/response mod, such as DNS.
 
 
 server
@@ -73,6 +75,7 @@ $ export SERVER_ID=16Uiu2HAm19Fic7qSLVVmFVe5RDzrdKrii7fcVUU7wYHXEtRTjXrw
 $ p2p-tun client tun --tun-name tun0
 
 $ curl 192.168.1.1:80
+$ dig www.github.com @192.168.1.1
 ```
 
 

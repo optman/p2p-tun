@@ -59,7 +59,6 @@ func NewNetstack(fd int, mtu uint32, tcpConnHandler func(*net.TCPAddr, Stream),
 		var wq waiter.Queue
 		ep, err := r.CreateEndpoint(&wq)
 		if err != nil {
-			log.Error(err)
 			r.Complete(true)
 			return
 		}
@@ -75,7 +74,6 @@ func NewNetstack(fd int, mtu uint32, tcpConnHandler func(*net.TCPAddr, Stream),
 		var wq waiter.Queue
 		ep, err := r.CreateEndpoint(&wq)
 		if err != nil {
-			log.Error(err)
 			return
 		}
 

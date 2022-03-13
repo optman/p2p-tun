@@ -21,12 +21,7 @@ func startSocks5Server(c *cli.Context) error {
 
 	ctx.Logger().Info("start socks5 server")
 
-	svr, err := newSocks5Server()
-	if err != nil {
-		return err
-	}
-
-	ctx.Server().HandleStream(tun.TcpProtocolID, handleSocks5TcpStreamFunc(ctx, svr))
+	ctx.Server().HandleStream(tun.TcpProtocolID, handleSocks5TcpStreamFunc(ctx))
 	ctx.Server().HandleStream(tun.UdpProtocolID, handleSocks5UdpStreamFunc(ctx))
 
 	select {

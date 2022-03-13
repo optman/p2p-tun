@@ -41,7 +41,7 @@ func startTun(c *cli.Context) error {
 		return nil
 	}
 
-	if err := tun.NewNetstack(fd, mtu, handleTcpConn(ctx), handleUdpConn(ctx)); err != nil {
+	if err := tun.NewNetstack(fd, mtu, handleTcpConn(ctx), handleUdpConn(ctx, mtu)); err != nil {
 		return err
 	}
 
@@ -71,7 +71,7 @@ func handleTcpConn(ctx context.Context) func(target_addr *net.TCPAddr, src tun.S
 		}
 		defer dst.Close()
 
-		if err := socksConnect(dst, target_addr); err != nil {
+		if err := socksConnect(dst, target_addr.IP, target_addr.Port); err != nil {
 			return
 		}
 
@@ -79,7 +79,7 @@ func handleTcpConn(ctx context.Context) func(target_addr *net.TCPAddr, src tun.S
 	}
 }
 
-func handleUdpConn(ctx context.Context) func(target_addr *net.UDPAddr, src tun.Stream) {
+func handleUdpConn(ctx context.Context, mtu uint32) func(target_addr *net.UDPAddr, src tun.Stream) {
 
 	createStream := ctx.Client().CreateStream(tun.UdpProtocolID)
 	log := ctx.Logger()
@@ -99,11 +99,11 @@ func handleUdpConn(ctx context.Context) func(target_addr *net.UDPAddr, src tun.S
 
 		dst.SetDeadline(time.Now().Add(UDPTIMEOUT))
 
-		if err := socksConnect2(dst, target_addr.IP, target_addr.Port); err != nil {
+		if err := socksConnect(dst, target_addr.IP, target_addr.Port); err != nil {
 			return
 		}
 
-		buf := make([]byte, 4096)
+		buf := make([]byte, mtu)
 		n, err := src.Read(buf)
 		if err != nil {
 			return

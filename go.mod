@@ -3,7 +3,6 @@ module github.com/optman/p2p-tun
 go 1.17
 
 require (
-	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/ipfs/go-log/v2 v2.4.0
 	github.com/libp2p/go-libp2p v0.17.0
 	github.com/libp2p/go-libp2p-core v0.13.0
