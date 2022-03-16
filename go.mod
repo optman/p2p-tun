@@ -12,7 +12,7 @@ require (
 	gvisor.dev/gvisor v0.0.0-20220304043134-d18bc8165ea6
 )
 
-replace github.com/libp2p/go-libp2p v0.17.0 => github.com/optman/go-libp2p v0.17.1-0.20220224074507-81998574ff83
+replace github.com/libp2p/go-libp2p v0.17.0 => github.com/optman/go-libp2p v0.17.1-0.20220316141049-324436b6096f
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect

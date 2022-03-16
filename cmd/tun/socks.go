@@ -87,7 +87,7 @@ func handleSocks5UdpStreamFunc(ctx context.Context) func(conn host.Stream) {
 			Port: port,
 		}
 
-		log.Debugf("udp %s", addr)
+		log.Debugf("udp %s", addr.String())
 
 		buf, err := io.ReadAll(src)
 		if err != nil {
@@ -140,7 +140,7 @@ func handleSocks5TcpStreamFunc(ctx context.Context) func(conn host.Stream) {
 			Port: port,
 		}
 
-		log.Debugf("tcp %s", addr)
+		log.Debugf("tcp %s", addr.String())
 
 		dst, err := net.Dial(addr.Network(), addr.String())
 		if err != nil {
