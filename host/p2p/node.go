@@ -2,9 +2,6 @@ package p2p
 
 import (
 	"context"
-	"fmt"
-	"sync"
-	"time"
 
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p"
@@ -13,24 +10,20 @@ import (
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/protocol"
-	"github.com/libp2p/go-libp2p-core/routing"
-	dht "github.com/libp2p/go-libp2p-kad-dht"
+	rndz "github.com/optman/rndz-tcp-transport"
 )
 
 var (
 	log = logging.Logger("p2p-tun")
 )
 
-func NewServerNode(ctx context.Context, port int, privKey crypto.PrivKey) (host.Host, error) {
+func NewServerNode(ctx context.Context, listenAddr, rndzServer string, privKey crypto.PrivKey) (host.Host, error) {
+	peerId, _ := peer.IDFromPrivateKey(privKey)
 
 	h, err := libp2p.New(
-		libp2p.ListenAddrStrings(listen_addrs(port)...),
+		libp2p.ListenAddrStrings(listenAddr),
 		libp2p.Identity(privKey),
-		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
-			return dht.New(ctx, h, dht.Mode(dht.ModeClient))
-		}),
-		libp2p.EnableHolePunching(),
-		libp2p.EnableAutoRelay(),
+		libp2p.Transport(rndz.NewRNDZTransport, rndz.WithId(peerId), rndz.WithRndzServer(rndzServer)),
 	)
 
 	if err != nil {
@@ -46,81 +39,19 @@ func NewServerNode(ctx context.Context, port int, privKey crypto.PrivKey) (host.
 
 	})
 
-	go bootstrap(ctx, h)
-
 	return h, nil
 }
 
-func NewClientNode(ctx context.Context, port int, privKey crypto.PrivKey) (host.Host, error) {
+func NewClientNode(ctx context.Context, privKey crypto.PrivKey) (host.Host, error) {
+	peerId, _ := peer.IDFromPrivateKey(privKey)
 
 	h, err := libp2p.New(
 		libp2p.Identity(privKey),
-		libp2p.ListenAddrStrings(listen_addrs(port)...),
-		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
-			return dht.New(ctx, h, dht.Mode(dht.ModeClient))
-		}),
-
-		libp2p.EnableHolePunching(),
+		libp2p.Transport(rndz.NewRNDZTransport, rndz.WithId(peerId)),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	go bootstrap(ctx, h)
-
 	return h, nil
-}
-
-func bootstrap(ctx context.Context, h host.Host) {
-
-	bootstrap := func() {
-		w := sync.WaitGroup{}
-		success := 0
-		for _, p := range dht.DefaultBootstrapPeers {
-			p, _ := peer.AddrInfoFromP2pAddr(p)
-			w.Add(1)
-			go func() {
-				defer w.Done()
-				if err := h.Connect(ctx, *p); err == nil {
-					success += 1
-				} else {
-					log.Debugf("connect bootstrap node %s fail: %s", p.ID, err)
-				}
-			}()
-		}
-
-		w.Wait()
-
-		if success == 0 {
-			log.Error("bootstrap fail")
-		}
-	}
-
-	//re-bootstrap after network recovery
-	for {
-		if len(h.Network().Conns()) < 1 {
-			bootstrap()
-		}
-
-		select {
-		case <-time.After(5 * time.Minute):
-		case <-ctx.Done():
-			return
-		}
-	}
-}
-
-func listen_addrs(port int) []string {
-	addrs := []string{
-		"/ip4/0.0.0.0/tcp/%d",
-		"/ip4/0.0.0.0/udp/%d/quic",
-		"/ip6/::/tcp/%d",
-		"/ip6/::/udp/%d/quic",
-	}
-
-	for i, a := range addrs {
-		addrs[i] = fmt.Sprintf(a, port)
-	}
-
-	return addrs
 }

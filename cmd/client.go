@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
+
+	ma "github.com/multiformats/go-multiaddr"
 	"github.com/optman/p2p-tun/cmd/context"
 	"github.com/optman/p2p-tun/cmd/port"
 	"github.com/optman/p2p-tun/cmd/tun"
 	"github.com/optman/p2p-tun/host"
 
-	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,9 +18,9 @@ func ClientCmd() *cli.Command {
 		Usage: "start client node",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "server-id",
-				Usage:    "server peer id",
-				EnvVars:  []string{"SERVER_ID"},
+				Name:     "server-addr",
+				Usage:    "server multiaddr",
+				EnvVars:  []string{"SERVER_ADDR"},
 				Required: true,
 			},
 		},
@@ -41,9 +42,9 @@ func connect(c *cli.Context) error {
 	ctx := context.Context{c.Context}
 	conf := ctx.NodeConfig()
 
-	server_id, err := peer.Decode(c.String("server-id"))
+	serverAddr, err := ma.NewMultiaddr(c.String("server-addr"))
 	if err != nil {
-		return fmt.Errorf("invalid server id, %s", err)
+		return fmt.Errorf("invalid server addr, %s", err)
 	}
 
 	log.Info("connecting")
@@ -55,7 +56,7 @@ func connect(c *cli.Context) error {
 	readyChan := make(chan struct{})
 
 	go func() {
-		if err := client.Connect(server_id); err != nil {
+		if err := client.Connect(serverAddr); err != nil {
 			log.Fatal(err)
 		}
 		log.Info("connected")

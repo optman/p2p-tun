@@ -6,12 +6,14 @@ import (
 	"io"
 	"time"
 
+	ma "github.com/multiformats/go-multiaddr"
 	"github.com/optman/p2p-tun/auth"
 	"github.com/optman/p2p-tun/host/p2p"
 
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p-core/peerstore"
 	"github.com/libp2p/go-libp2p-core/protocol"
 )
 
@@ -32,7 +34,7 @@ type Stream interface {
 
 func NewClient(ctx context.Context, conf *NodeConfig) (*Client, error) {
 
-	h, err := p2p.NewClientNode(ctx, conf.ListenPort, conf.PrivateKey)
+	h, err := p2p.NewClientNode(ctx, conf.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +46,11 @@ func NewClient(ctx context.Context, conf *NodeConfig) (*Client, error) {
 	}, nil
 }
 
-func (self *Client) Connect(id peer.ID) error {
+func (self *Client) Connect(serverAddr ma.Multiaddr) error {
+
+	addr, id := peer.SplitAddr(serverAddr)
+	self.h.Peerstore().AddAddr(id, addr, peerstore.PermanentAddrTTL)
+
 	self.target_id = id
 
 	ctx := self.ctx

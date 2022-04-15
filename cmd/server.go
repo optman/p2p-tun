@@ -1,6 +1,10 @@
 package cmd
 
 import (
+	"errors"
+	"fmt"
+
+	ma "github.com/multiformats/go-multiaddr"
 	"github.com/optman/p2p-tun/cmd/context"
 	"github.com/optman/p2p-tun/cmd/port"
 	"github.com/optman/p2p-tun/cmd/tun"
@@ -40,7 +44,19 @@ func startServer(c *cli.Context) error {
 		return err
 	}
 
-	log.Infof("server id %s", server.Host().ID())
+	serverAddr, err := ma.NewMultiaddr(conf.RndzServer)
+	if err != nil {
+		return errors.New("invalid rndz server addr")
+	}
+
+	p2pPart, err := ma.NewMultiaddr(fmt.Sprintf("/p2p/%s", server.Host().ID()))
+	if err != nil {
+		panic(err)
+	}
+
+	serverAddr = serverAddr.Encapsulate(p2pPart)
+
+	log.Infof("server addr %s", serverAddr)
 
 	readyChan := make(chan struct{})
 

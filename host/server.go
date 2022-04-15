@@ -2,14 +2,11 @@ package host
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/optman/p2p-tun/auth"
 	"github.com/optman/p2p-tun/host/p2p"
 
 	logging "github.com/ipfs/go-log/v2"
-	"github.com/libp2p/go-libp2p-core/event"
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/protocol"
@@ -26,7 +23,7 @@ type Server struct {
 }
 
 func NewServer(ctx context.Context, conf *NodeConfig) (*Server, error) {
-	h, err := p2p.NewServerNode(ctx, conf.ListenPort, conf.PrivateKey)
+	h, err := p2p.NewServerNode(ctx, conf.ListenAddr, conf.RndzServer, conf.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -43,34 +40,6 @@ func (self *Server) Host() host.Host {
 }
 
 func (self *Server) Start() error {
-	subReachability, _ := self.h.EventBus().Subscribe(new(event.EvtLocalReachabilityChanged))
-	defer subReachability.Close()
-
-	log.Info("wait public or relay addresses ready...")
-
-loop:
-	for {
-		if containsRelayAddr(self.h.Addrs()) {
-			break loop
-		}
-		select {
-		case ev, ok := <-subReachability.Out():
-			if !ok {
-				return fmt.Errorf("Unreachable!")
-			}
-			evt := ev.(event.EvtLocalReachabilityChanged)
-			if evt.Reachability == network.ReachabilityPublic {
-				break loop
-			}
-
-		case <-time.After(5 * time.Second):
-		case <-self.ctx.Done():
-			return nil
-		}
-	}
-
-	log.Info("ready be connect, addrs:", self.h.Addrs())
-
 	return nil
 }
 

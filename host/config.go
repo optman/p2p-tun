@@ -8,6 +8,7 @@ import (
 
 type NodeConfig struct {
 	PrivateKey crypto.PrivKey
-	ListenPort int
+	ListenAddr string
+	RndzServer string
 	Auth       *auth.Authenticator
 }
