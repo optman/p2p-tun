@@ -757,10 +757,10 @@ github.com/openzipkin/zipkin-go v0.1.1/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTm
 github.com/openzipkin/zipkin-go v0.1.6/go.mod h1:QgAqvLzwWbR/WpD4A3cGpPtJrZXNIiJc5AZX7/PBEpw=
 github.com/openzipkin/zipkin-go v0.2.1/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
 github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
-github.com/optman/rndz-go v0.0.0-20220413142931-eeea51aae1a4 h1:CroU5NW1E88yfAYs3+Na+MhAnlcTaTbZ0EXEJ2wcwWs=
-github.com/optman/rndz-go v0.0.0-20220413142931-eeea51aae1a4/go.mod h1:VQTvsXp4TNMMusgs5yLumeDSVLzxON3GgIbl0+S0uY4=
-github.com/optman/rndz-tcp-transport v0.0.0-20220415085127-72349a4ed33d h1:MynDsCnK7SMxWBwbZdIEjv9OdW1hcP4ffIz+2JXHM8Y=
-github.com/optman/rndz-tcp-transport v0.0.0-20220415085127-72349a4ed33d/go.mod h1:n3VagkZUqee2Yx8gIaMSGmZOCqK9VLhRtiPtCJRMjN0=
+github.com/optman/rndz-go v0.0.0-20220415140046-3ac8ee452123 h1:VyhyDsKf0f6qdE5JALjkJDhp6rhLqixjhuDySgj6peU=
+github.com/optman/rndz-go v0.0.0-20220415140046-3ac8ee452123/go.mod h1:VQTvsXp4TNMMusgs5yLumeDSVLzxON3GgIbl0+S0uY4=
+github.com/optman/rndz-tcp-transport v0.0.0-20220415142026-58666b31a341 h1:759lhtXCK0Vmb4hIRpTV5CE7z+TYPi8TfExc5fahTiw=
+github.com/optman/rndz-tcp-transport v0.0.0-20220415142026-58666b31a341/go.mod h1:ZPZmERzc/ZuHNgYTPHjHPu1zWEavYhRl4mdoZoQ5Q6k=
 github.com/pact-foundation/pact-go v1.0.4/go.mod h1:uExwJY4kCzNPcHRj+hCR/HBbOOIwwtUjcrb0b5/5kLM=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 h1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=

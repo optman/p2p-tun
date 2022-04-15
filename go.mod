@@ -7,6 +7,7 @@ require (
 	github.com/libp2p/go-libp2p v0.18.0
 	github.com/libp2p/go-libp2p-core v0.15.0
 	github.com/multiformats/go-multiaddr v0.5.0
+	github.com/optman/rndz-tcp-transport v0.0.0-20220415142026-58666b31a341
 	github.com/urfave/cli/v2 v2.4.0
 	gvisor.dev/gvisor v0.0.0-20220304043134-d18bc8165ea6
 )
@@ -95,8 +96,7 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/onsi/ginkgo v1.16.4 // indirect
 	github.com/opencontainers/runtime-spec v1.0.3-0.20211123151946-c2389c3cb60a // indirect
-	github.com/optman/rndz-go v0.0.0-20220413142931-eeea51aae1a4 // indirect
-	github.com/optman/rndz-tcp-transport v0.0.0-20220415085127-72349a4ed33d // indirect
+	github.com/optman/rndz-go v0.0.0-20220415140046-3ac8ee452123 // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.11.0 // indirect
