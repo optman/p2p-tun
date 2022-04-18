@@ -96,8 +96,9 @@ require (
 	github.com/onsi/ginkgo v1.16.4 // indirect
 	github.com/opencontainers/runtime-spec v1.0.3-0.20211123151946-c2389c3cb60a // indirect
 	github.com/optman/rndz-go v0.0.0-20220418084458-71bda13b0bfe // indirect
-	github.com/optman/rndz-libp2p-quic-transport v0.17.1-0.20220418085047-5dd3d80ba938 // indirect
-	github.com/optman/rndz-tcp-transport v0.0.0-20220418085003-336094069616 // indirect
+	github.com/optman/rndz-libp2p-quic-transport v0.17.1-0.20220418134820-fe1137e76963 // indirect
+	github.com/optman/rndz-multiaddr v0.0.0-20220418134042-6ac70a638693 // indirect
+	github.com/optman/rndz-tcp-transport v0.0.0-20220418134529-dbb391c95bc2 // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.11.0 // indirect

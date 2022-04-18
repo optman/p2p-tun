@@ -676,10 +676,16 @@ github.com/optman/rndz-go v0.0.0-20220418084458-71bda13b0bfe h1:XooDJT5biIXIeDQq
 github.com/optman/rndz-go v0.0.0-20220418084458-71bda13b0bfe/go.mod h1:VQTvsXp4TNMMusgs5yLumeDSVLzxON3GgIbl0+S0uY4=
 github.com/optman/rndz-libp2p-quic-transport v0.17.1-0.20220418085047-5dd3d80ba938 h1:tvr/2175wAgxnTraNkMHBDWXXzlfJYNgm2gxwbRk9QM=
 github.com/optman/rndz-libp2p-quic-transport v0.17.1-0.20220418085047-5dd3d80ba938/go.mod h1:ooCOh+Jvmlm4b2eq9jpqBxceW8+UTYNOePk1bQBjJqE=
+github.com/optman/rndz-libp2p-quic-transport v0.17.1-0.20220418134820-fe1137e76963 h1:ya3N+SR43YNC/nqd7rdF3ij568FKKDJ9zGH704G8ARM=
+github.com/optman/rndz-libp2p-quic-transport v0.17.1-0.20220418134820-fe1137e76963/go.mod h1:JQFXUEEpgLyGMb8G2TTjbSSfmuUX3Ta1zxf4Fge0OC8=
+github.com/optman/rndz-multiaddr v0.0.0-20220418134042-6ac70a638693 h1:eTIk0Q+As+Tlvse3IoHFJmpiGMi1ILv68xfdwoCUAN4=
+github.com/optman/rndz-multiaddr v0.0.0-20220418134042-6ac70a638693/go.mod h1:C+AaUTa0SbKVA5XbTxG33xERz7m+5z9WPma6igYnDpE=
 github.com/optman/rndz-tcp-transport v0.0.0-20220415142026-58666b31a341 h1:759lhtXCK0Vmb4hIRpTV5CE7z+TYPi8TfExc5fahTiw=
 github.com/optman/rndz-tcp-transport v0.0.0-20220415142026-58666b31a341/go.mod h1:ZPZmERzc/ZuHNgYTPHjHPu1zWEavYhRl4mdoZoQ5Q6k=
 github.com/optman/rndz-tcp-transport v0.0.0-20220418085003-336094069616 h1:+IkBLJO4ITryOcJAokdRMPxC7bbJmf95uF3ZdPSSyBs=
 github.com/optman/rndz-tcp-transport v0.0.0-20220418085003-336094069616/go.mod h1:5bW7p30RZL+lBm05lKuWgCSoyCLbEIHQm78GQyFZg6M=
+github.com/optman/rndz-tcp-transport v0.0.0-20220418134529-dbb391c95bc2 h1:xB+KrLoZv/Ft7CkNxgMIkBzNIq6Qj4nzeHJM87l1gqM=
+github.com/optman/rndz-tcp-transport v0.0.0-20220418134529-dbb391c95bc2/go.mod h1:ss2GG+fEaLHy36VpIH8o6xghrjExLVbMIFhk5q57ySw=
 github.com/pact-foundation/pact-go v1.0.4/go.mod h1:uExwJY4kCzNPcHRj+hCR/HBbOOIwwtUjcrb0b5/5kLM=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 h1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=

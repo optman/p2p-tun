@@ -27,7 +27,7 @@ var Flags = []cli.Flag{
 	&cli.StringSliceFlag{
 		Name:  "listen-addrs",
 		Usage: "p2p listen multiaddress",
-		Value: cli.NewStringSlice("/ip4/0.0.0.0/udp/0/p2p-circuit/dns/rndz.optman.net/udp/8888", "/ip4/0.0.0.0/tcp/0/p2p-circuit/dns/rndz.optman.net/tcp/8888"),
+		Value: cli.NewStringSlice("/ip4/0.0.0.0/udp/0/rndz/dns/rndz.optman.net/udp/8888", "/ip4/0.0.0.0/tcp/0/rndz/dns/rndz.optman.net/tcp/8888"),
 	},
 	&cli.StringFlag{
 		Name:    "secret",

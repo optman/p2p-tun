@@ -15,6 +15,8 @@ import (
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/peerstore"
 	"github.com/libp2p/go-libp2p-core/protocol"
+
+	ra "github.com/optman/rndz-multiaddr"
 )
 
 type Client struct {
@@ -48,7 +50,7 @@ func NewClient(ctx context.Context, conf *NodeConfig) (*Client, error) {
 
 func (self *Client) Connect(serverAddr ma.Multiaddr) error {
 
-	addr, id := peer.SplitAddr(serverAddr)
+	addr, id := ra.SplitDialAddr(serverAddr)
 	self.h.Peerstore().AddAddr(id, addr, peerstore.PermanentAddrTTL)
 
 	self.target_id = id

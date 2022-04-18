@@ -9,7 +9,7 @@ import (
 	"github.com/optman/p2p-tun/cmd/port"
 	"github.com/optman/p2p-tun/cmd/tun"
 	"github.com/optman/p2p-tun/host"
-	"github.com/optman/p2p-tun/util"
+	ra "github.com/optman/rndz-multiaddr"
 
 	"github.com/urfave/cli/v2"
 )
@@ -51,12 +51,12 @@ func startServer(c *cli.Context) error {
 		if err != nil {
 			return fmt.Errorf("invalid listen address, %s", addr)
 		}
-		_, rndzServer := util.SplitListenAddr(addr)
+		_, rndzServer := ra.SplitListenAddr(addr)
 		if rndzServer == nil {
 			return errors.New("invalid listen address, no rndz server set")
 		}
 
-		serverAddrs = append(serverAddrs, util.NewServerAddr(rndzServer, server.Host().ID()))
+		serverAddrs = append(serverAddrs, ra.NewDialAddr(rndzServer, server.Host().ID()))
 	}
 
 	log.Infof("server addr %v", serverAddrs)
