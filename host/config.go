@@ -7,8 +7,7 @@ import (
 )
 
 type NodeConfig struct {
-	PrivateKey crypto.PrivKey
-	ListenAddr string
-	RndzServer string
-	Auth       *auth.Authenticator
+	PrivateKey  crypto.PrivKey
+	ListenAddrs []string
+	Auth        *auth.Authenticator
 }

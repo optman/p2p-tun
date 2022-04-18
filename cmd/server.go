@@ -9,6 +9,7 @@ import (
 	"github.com/optman/p2p-tun/cmd/port"
 	"github.com/optman/p2p-tun/cmd/tun"
 	"github.com/optman/p2p-tun/host"
+	"github.com/optman/p2p-tun/util"
 
 	"github.com/urfave/cli/v2"
 )
@@ -44,19 +45,21 @@ func startServer(c *cli.Context) error {
 		return err
 	}
 
-	serverAddr, err := ma.NewMultiaddr(conf.RndzServer)
-	if err != nil {
-		return errors.New("invalid rndz server addr")
+	var serverAddrs []ma.Multiaddr
+	for _, a := range conf.ListenAddrs {
+		addr, err := ma.NewMultiaddr(a)
+		if err != nil {
+			return fmt.Errorf("invalid listen address, %s", addr)
+		}
+		_, rndzServer := util.SplitListenAddr(addr)
+		if rndzServer == nil {
+			return errors.New("invalid listen address, no rndz server set")
+		}
+
+		serverAddrs = append(serverAddrs, util.NewServerAddr(rndzServer, server.Host().ID()))
 	}
 
-	p2pPart, err := ma.NewMultiaddr(fmt.Sprintf("/p2p/%s", server.Host().ID()))
-	if err != nil {
-		panic(err)
-	}
-
-	serverAddr = serverAddr.Encapsulate(p2pPart)
-
-	log.Infof("server addr %s", serverAddr)
+	log.Infof("server addr %v", serverAddrs)
 
 	readyChan := make(chan struct{})
 

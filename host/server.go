@@ -23,7 +23,7 @@ type Server struct {
 }
 
 func NewServer(ctx context.Context, conf *NodeConfig) (*Server, error) {
-	h, err := p2p.NewServerNode(ctx, conf.ListenAddr, conf.RndzServer, conf.PrivateKey)
+	h, err := p2p.NewServerNode(ctx, conf.ListenAddrs, conf.PrivateKey)
 	if err != nil {
 		return nil, err
 	}

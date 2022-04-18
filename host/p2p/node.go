@@ -8,22 +8,24 @@ import (
 	"github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/network"
-	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/protocol"
-	rndz "github.com/optman/rndz-tcp-transport"
+
+	quic "github.com/optman/rndz-libp2p-quic-transport"
+	tcp "github.com/optman/rndz-tcp-transport"
 )
 
 var (
 	log = logging.Logger("p2p-tun")
 )
 
-func NewServerNode(ctx context.Context, listenAddr, rndzServer string, privKey crypto.PrivKey) (host.Host, error) {
-	peerId, _ := peer.IDFromPrivateKey(privKey)
+func NewServerNode(ctx context.Context, listenAddrs []string, privKey crypto.PrivKey) (host.Host, error) {
 
 	h, err := libp2p.New(
-		libp2p.ListenAddrStrings(listenAddr),
+		libp2p.ListenAddrStrings(listenAddrs...),
 		libp2p.Identity(privKey),
-		libp2p.Transport(rndz.NewRNDZTransport, rndz.WithId(peerId), rndz.WithRndzServer(rndzServer)),
+		libp2p.Transport(tcp.NewTransport),
+		libp2p.Transport(quic.NewTransport),
+		libp2p.DisableRelay(),
 	)
 
 	if err != nil {
@@ -43,11 +45,11 @@ func NewServerNode(ctx context.Context, listenAddr, rndzServer string, privKey c
 }
 
 func NewClientNode(ctx context.Context, privKey crypto.PrivKey) (host.Host, error) {
-	peerId, _ := peer.IDFromPrivateKey(privKey)
-
 	h, err := libp2p.New(
 		libp2p.Identity(privKey),
-		libp2p.Transport(rndz.NewRNDZTransport, rndz.WithId(peerId)),
+		libp2p.Transport(tcp.NewTransport),
+		libp2p.Transport(quic.NewTransport),
+		libp2p.DisableRelay(),
 	)
 	if err != nil {
 		return nil, err
